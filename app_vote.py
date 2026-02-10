@@ -7,89 +7,107 @@ from PIL import Image
 import plotly.graph_objects as go
 import plotly.express as px
 
-# ================= 1. 极致视觉引擎 (CSS 深度定制) =================
+# ================= 1. 极简响应式美学引擎 (PC/手机双端适配) =================
 st.set_page_config(page_title="肆叁叁月季起名社", page_icon="💐", layout="centered")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Inter:wght@400;600&display=swap');
-    .stApp { background-color: #F5F5F7 !important; background-image: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #E2E2E7 100%) !important; }
     
-    /* 窄版面板控制 */
+    /* 1. 全局背景 */
+    .stApp { 
+        background-color: #F5F5F7 !important; 
+        background-image: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #E2E2E7 100%) !important;
+    }
+    
+    /* 2. 核心面板：响应式宽度锁定 */
     div[data-testid="stVerticalBlockBorderWrapper"]:first-of-type {
-        max-width: 620px !important; margin: 0 auto !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #FFFFFF !important; border-radius: 32px !important;
+        width: 100% !important;
+        max-width: 620px !important; 
+        margin: 0 auto !important;
+        background: rgba(255, 255, 255, 0.95) !important; /* 纯白高感玻璃 */
+        border: 2px solid #FFFFFF !important; 
+        border-radius: 28px !important;
         box-shadow: 0 20px 60px rgba(0,0,0,0.05), inset 0 1px 2px rgba(255,255,255,0.5) !important;
-        padding: 40px !important;
+        padding: 30px !important;
     }
 
-    .header-box { padding-top: 60px; padding-bottom: 20px; text-align: center; }
-    .artistic-title { font-family: 'Noto Serif SC', serif; font-size: 58px; font-weight: 900; color: #000000 !important; letter-spacing: 16px; }
+    /* 3. 标题区自适应 */
+    .header-box { padding-top: 40px; padding-bottom: 20px; text-align: center; }
+    .artistic-title { 
+        font-family: 'Noto Serif SC', serif; font-weight: 900; color: #000000 !important; letter-spacing: 12px; 
+        font-size: 52px; /* 电脑默认 */
+    }
 
-    /* 强制横向布局 */
-    div[data-testid="stHorizontalBlock"] { flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; }
-    div[data-testid="column"] { width: 50% !important; min-width: 0 !important; flex: 1 1 auto !important; }
-
-    /* 按钮：蓝底白字 */
+    /* 4. 按钮样式：蓝底 + 强制纯白文字 */
     div.stButton > button {
-        background-color: #0071E3 !important; color: #FFFFFF !important;
-        border-radius: 99px !important; padding: 10px 40px !important;
-        border: none !important; width: 100% !important; font-weight: 600 !important;
+        background-color: #0071E3 !important;
+        color: #FFFFFF !important;
+        border-radius: 99px !important;
+        padding: 10px 40px !important;
+        border: none !important;
+        width: 100% !important;
+        font-weight: 600 !important;
     }
-    div.stButton > button * { color: #FFFFFF !important; } 
+    /* 强制按钮内所有层级的文字颜色 */
+    div.stButton > button p, div.stButton > button span {
+        color: #FFFFFF !important;
+    }
+    div.stButton > button:hover { background-color: #0077ED !important; }
 
-    /* 档案排版 */
-    .id-title { font-size: 44px; font-weight: 900; color: #000000 !important; margin-top: -10px !important; line-height: 1.1 !important; margin-bottom: 20px !important; }
-    .desc-box { color: #1D1D1F !important; font-size: 15px; line-height: 1.8 !important; text-align: justify; }
+    /* 5. 品种档案排版 */
+    .id-title { font-size: 42px; font-weight: 900; color: #000000 !important; margin-top: -10px !important; line-height: 1.1 !important; margin-bottom: 15px !important; }
+    .desc-box { color: #1D1D1F !important; font-size: 15px; line-height: 2.0 !important; text-align: justify; }
 
+    /* 6. 投票卡片 */
     .vote-item {
-        background: #FFFFFF !important; border-radius: 20px !important;
-        padding: 20px 25px !important; border: 1px solid #E5E5E7 !important;
+        background: #FFFFFF !important; border-radius: 18px !important;
+        padding: 15px 20px !important; border: 1px solid #E5E5E7 !important;
         margin-bottom: 12px !important;
     }
 
+    /* 7. 手机端专属适配补丁 (@media query) */
+    @media (max-width: 640px) {
+        .artistic-title { font-size: 32px !important; letter-spacing: 4px !important; }
+        div[data-testid="stVerticalBlockBorderWrapper"]:first-of-type {
+            padding: 20px !important;
+            border-radius: 24px !important;
+        }
+        /* 手机端让 col1 和 col2 纵向排列 */
+        div[data-testid="stHorizontalBlock"] { flex-direction: column !important; }
+        div[data-testid="column"] { width: 100% !important; }
+        .id-title { font-size: 36px !important; text-align: center; margin-top: 15px !important; }
+    }
+
+    /* 固定页脚 */
     .fixed-footer {
         position: fixed; bottom: 0; left: 0; width: 100%;
         background: rgba(245, 245, 247, 0.95); text-align: center; padding: 15px 0;
         border-top: 1px solid #D2D2D7; color: #86868B !important; font-size: 12px; z-index: 1000;
     }
-    .secret-wrap { position: fixed; bottom: 12px; right: 20px; z-index: 1001; opacity: 0.2; }
     header, footer, [data-testid="stHeader"] { visibility: hidden !important; }
-            /* 1. 隐藏掉遮挡图标的提示文字 'Press Enter to apply' */
-
-    div[data-testid="InputInstructions"] {
-        display: none !important;
-    }
-
+    .secret-wrap { position: fixed; bottom: 12px; right: 20px; z-index: 1001; opacity: 0.1; }
+    .secret-wrap button { background: transparent !important; border: none !important; color: #86868B !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ================= 2. 实时数据持久化逻辑 (核心修正) =================
+# ================= 2. 数据处理与持久化 =================
 DATA_FILE = "vote_data.json"
 ADMIN_PWD = "433admin"
 
-def load_data_from_file():
+def load_data():
     if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            try:
-                return json.load(f)
-            except:
-                return {}
+        with open(DATA_FILE, 'r', encoding='utf-8') as f: return json.load(f)
     return {}
 
-def save_data_to_file(data):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+def save_data(data):
+    with open(DATA_FILE, 'w', encoding='utf-8') as f: 
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# 核心变化：每次启动或刷新时，强制从文件读取到 SessionState，不再使用 cache
-if 'db_data' not in st.session_state:
-    st.session_state.db_data = load_data_from_file()
+if 'db_data' not in st.session_state: st.session_state.db_data = load_data()
+if 'persistent_id' not in st.session_state: st.session_state.persistent_id = "cy24027"
 
-if 'persistent_id' not in st.session_state:
-    st.session_state.persistent_id = "cy24027"
-
-# ================= 3. 品种库配置 =================
+# ================= 3. 品种库配置 (全 17 种) =================
 varieties = [
     {"id": "cy24027", "desc": "花色为极具质感的深红至黑红色。花瓣厚度极高，带有丝绒般的光泽。花型为深杯状，瓶插寿命长。"},
     {"id": "cy24057", "desc": "花型标准的代表。花瓣排列整齐划一，呈现出完美的数学几何螺旋结构。颜色为纯正的中国红。"},
@@ -114,9 +132,9 @@ cand_map = {
     "cy24027": ["中农丹赫", "中农绛阙", "中农丹墨", "中农绯重", "中农绛肃", "中农朱极"],
     "cy24057": ["中农丹赫", "中农丹正", "中农绛枢", "中农朱律", "中农绯典", "中农丹楷"],
     "cy24065": ["中农丹赫", "中农丹弘", "中农绯钜", "中农朱硕", "中农绛巍", "中农丹骜"],
-    "cy24001": ["中农烨煌", "中农烨炽", "中农烁阳", "中农曦照", "中农烨焱", "中农朝蔚"],
+    "cy24001": ["中农烨煌", "中农烨炽", "中农烁阳", "中农曦照", "中农朝蔚"],
     "cy24051": ["中农烨煌", "中农烨透", "中农烁曜", "中农曦朗", "中农烨纯", "中农烁熠"],
-    "cy24005": ["中农烁珠", "中农曦丸", "中农烁圆", "中农烨铃", "中农烁玲"],
+    "cy24005": ["中农烁珠", "中农曦丸", "中农烁圆", "中农烨铃", "中农曦果", "中农烁玲"],
     "cy24045": ["中农沁澜", "中农沁涛", "中农嫣漪", "中农脂涌", "中农沁褶", "中农嫣裳"],
     "cy24060": ["中农嫣昂", "中农嫣傲", "中农沁翘", "中农嫣凌", "中农沁扬", "中农嫣耸"],
     "cy24063": ["中农绛芒", "中农绛剑", "中农丹锐", "中农朱矢", "中农绯厉", "中农绛戟"],
@@ -130,10 +148,10 @@ cand_map = {
     "cy24079": ["中农绀绮", "中农绀繁", "中农绀华", "中农绀绸", "中农绀盛", "中农绀簇"],
 }
 
-# ================= 4. UI 渲染与同步逻辑 =================
+# ================= 4. UI 渲染与锚定逻辑 =================
 st.markdown('<div class="header-box"><div class="artistic-title">命名工作站</div></div>', unsafe_allow_html=True)
 
-# 动态下拉列表
+# 动态生成下拉标签
 options_labels = []
 saved_index = 0
 for i, v in enumerate(varieties):
@@ -142,103 +160,87 @@ for i, v in enumerate(varieties):
     options_labels.append(label)
     if vid == st.session_state.persistent_id: saved_index = i
 
-st.markdown('<div style="margin-bottom:10px; font-weight:500;">选择品种查看档案并投票：</div>', unsafe_allow_html=True)
-selected_label = st.selectbox("nav", options_labels, index=saved_index, label_visibility="collapsed")
+# 渲染下拉框
+st.markdown('<div style="text-align:center; margin-bottom:10px; font-weight:500; color:#666;">(oﾟvﾟ)ノ 切换品种查看并投票：</div>', unsafe_allow_html=True)
+c_nav1, c_nav2, c_nav3 = st.columns([0.5, 2, 0.5])
+with c_nav2:
+    selected_label = st.selectbox("nav", options_labels, index=saved_index, label_visibility="collapsed")
+st.session_state.persistent_id = varieties[options_labels.index(selected_label)]['id']
 
-# 切换品种逻辑
-new_id = varieties[options_labels.index(selected_label)]['id']
-if new_id != st.session_state.persistent_id:
-    st.session_state.persistent_id = new_id
-    st.rerun()
-
+# 加载选中品种
 v_data = next(item for item in varieties if item["id"] == st.session_state.persistent_id)
-# 核心修正：确保当前品种在 session 数据库中实时挂载
 if v_data["id"] not in st.session_state.db_data:
     st.session_state.db_data[v_data["id"]] = {"votes": {}, "collected": []}
 
-# 信息展示
+# 档案展示 (自适应：PC并排，手机堆叠)
 st.write("")
-col_img, col_info = st.columns([1.1, 1])
+col_img, col_info = st.columns([1, 1])
 with col_img:
-    img_name = f"{v_data['id']}.jpg"
-    if os.path.exists(img_name): st.image(Image.open(img_name), width="stretch")
-    else: st.info(f"📷 待上传 {img_name}")
+    img_n = f"{v_data['id']}.jpg"
+    if os.path.exists(img_n): st.image(Image.open(img_n), use_container_width=True)
+    else: st.info(f"📷 待上传 {img_n}")
 with col_info:
     st.markdown(f'<div class="id-title">{v_data["id"]}</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="desc-box"><b>特征描述：</b><br>{v_data["desc"]}</div>', unsafe_allow_html=True)
 
 # 投票区
 st.divider()
-st.markdown(f"### 🎰 候选方案投票")
+st.markdown("<h3 style='text-align:center; color:#000000; margin-bottom:20px;'>🎰 候选方案投票</h3>", unsafe_allow_html=True)
+
 all_candidates = cand_map[v_data["id"]] + st.session_state.db_data[v_data["id"]].get("collected", [])
 current_votes = st.session_state.db_data[v_data["id"]]["votes"]
 
 for name in all_candidates:
-    c_card, c_vote = st.columns([4, 1.2])
+    c_card, c_vote = st.columns([2.5, 1]) # 缩小比例，确保手机端按钮够宽
     count = current_votes.get(name, 0)
     with c_card:
         st.markdown(f'<div class="vote-item"><div style="font-size:18px; font-weight:700;">{name}</div>'
-                    f'<div style="font-size:12px; color:#0071E3; font-weight:600;">当前累积：{count} 票</div></div>', unsafe_allow_html=True)
+                    f'<div style="font-size:12px; color:#0071E3;">当前得票：{count}</div></div>', unsafe_allow_html=True)
     with c_vote:
-        st.write(""); st.write("")
-        # 实时投票逻辑
-        if st.button(f"投票", key=f"v_btn_{v_data['id']}_{name}"):
+        st.write("")
+        if st.button("投票", key=f"v_btn_{v_data['id']}_{name}"):
             if f"voted_{v_data['id']}" not in st.session_state:
-                # 1. 立即更新内存
                 st.session_state.db_data[v_data['id']]["votes"][name] = count + 1
-                # 2. 立即存盘
-                save_data_to_file(st.session_state.db_data)
-                # 3. 标记本地状态
+                save_data(st.session_state.db_data)
                 st.session_state[f"voted_{v_data['id']}"] = True
-                st.balloons()
-                # 4. 强制重绘，此时 UI 会读取内存中的最新 db_data
-                st.rerun() 
+                st.balloons(); st.rerun()
             else:
-                st.error("限投一票")
+                st.error("已投")
 
-# 名字征集
-with st.expander("✨ 灵感征集：在此提交您的新建议"):
+# 灵感征集
+with st.expander("✨ 灵感征集：在此提交您的建议"):
     c_in, c_sub = st.columns([3, 1])
-    with c_in: new_name = st.text_input("建议名", key=f"in_input_{v_data['id']}", placeholder="例如：中农丹旋（中农+色核+性状）", label_visibility="collapsed")
+    with c_in: new_name = st.text_input("建议名", key=f"in_{v_data['id']}", placeholder="例如：中农丹旋 (中农+色核+性状)", label_visibility="collapsed")
     with c_sub:
-        if st.button("提交建议", key=f"sub_btn_{v_data['id']}"):
+        if st.button("提交建议", key=f"sub_{v_data['id']}"):
             if new_name and new_name not in all_candidates:
-                st.session_state.db_data[v_data['id']]["collected"].append(new_name)
-                save_data_to_file(st.session_state.db_data)
+                st.session_state.db_data[v_data['id']]["collected"].append(new_name); save_data(st.session_state.db_data)
                 st.success("成功！"); st.rerun()
 
-# 计票看板 (实时刷新版)
-st.write(""); st.divider()
-with st.expander("📊 查看实时计票看板", expanded=True):
-    # 直接读取内存中的最新票数
+# 计票看板 (响应式图表)
+st.write("")
+with st.expander("📊 查看实时统计看板", expanded=False):
     df_res = pd.DataFrame({'Name': all_candidates, 'Votes': [current_votes.get(n, 0) for n in all_candidates]})
     if df_res['Votes'].sum() > 0:
-        h = 380
-        g1, g2 = st.columns(2)
+        g1, g2 = st.columns([1, 1]) # 在手机端这会自动变成上下两行
         with g1:
-            fig_bar = go.Figure(data=[go.Bar(x=df_res['Name'], y=df_res['Votes'], marker_color='#0071E3', marker_line_color='black', marker_line_width=2, width=0.5)])
-            fig_bar.update_layout(template="plotly_white", height=h, margin=dict(l=40, r=10, t=20, b=80), yaxis=dict(showline=True, linewidth=2, linecolor='black', ticks='outside'), xaxis=dict(showline=True, linewidth=2, linecolor='black', tickangle=-45, ticks='outside'))
-            st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
+            fig_bar = go.Figure(data=[go.Bar(x=df_res['Name'], y=df_res['Votes'], marker_color='#0071E3', marker_line_color='black', marker_line_width=1.5)])
+            fig_bar.update_layout(template="plotly_white", height=300, margin=dict(l=20,r=20,t=20,b=20)); st.plotly_chart(fig_bar, use_container_width=True)
         with g2:
-            fig_pie = px.pie(df_res, values='Votes', names='Name', hole=0.6, color_discrete_sequence=px.colors.qualitative.Pastel)
-            fig_pie.update_layout(height=h, margin=dict(l=10, r=10, t=20, b=20), legend=dict(orientation="h", y=-0.2))
-            st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
-    else: st.caption("尚无数据")
+            fig_pie = px.pie(df_res, values='Votes', names='Name', hole=0.5, color_discrete_sequence=px.colors.qualitative.Pastel)
+            fig_pie.update_layout(height=300, margin=dict(l=10,r=10,t=10,b=10)); st.plotly_chart(fig_pie, use_container_width=True)
+    else: st.caption("尚无投票数据")
 
-# ================= 5. 页脚与秘密重置 =================
-st.write("")
-st.markdown("""<div class="fixed-footer">© 2026 肆叁叁月季起名社 &nbsp; </div>""", unsafe_allow_html=True)
-
+# 页脚与秘密重置
+st.markdown('<div class="fixed-footer">© 2026 肆叁叁月季起名社</div>', unsafe_allow_html=True)
 st.markdown('<div class="secret-wrap">', unsafe_allow_html=True)
-if st.button("↵", key="final_reset_trigger"): st.session_state.show_reset = True
+if st.button("↵", key="reset"): st.session_state.show_reset = True
 st.markdown('</div>', unsafe_allow_html=True)
 
 if st.session_state.get("show_reset"):
-    pwd = st.text_input("Password", type="password", key="admin_pwd_final")
+    pwd = st.text_input("Admin", type="password")
     if pwd == ADMIN_PWD:
-        if st.button("RESET ALL DATA"):
-            save_data_to_file({})
-            # 清理所有内存状态
-            for k in list(st.session_state.keys()):
-                if k.startswith("voted_") or k == "db_data": del st.session_state[k]
+        if st.button("RESET ALL"):
+            save_data({})
+            for k in [k for k in st.session_state.keys() if k.startswith("voted_")]: del st.session_state[k]
             st.rerun()
