@@ -49,8 +49,25 @@ st.markdown("""
     div[data-testid="column"] { width: 50% !important; min-width: 0 !important; flex: 1 1 auto !important; }
 
     /* 4. 品种信息排版：直接融入背景 (无框) */
-    .id-title { font-size: 48px; font-weight: 900; color: #000000 !important; margin-bottom: 0px; }
-    .desc-box { color: #1D1D1F !important; font-size: 16px; line-height: 1.6; text-align: justify; }
+    /* 4. 品种信息排版微调 */
+    .id-title { 
+        font-size: 48px; 
+        font-weight: 900; 
+        color: #000000 !important; 
+        /* 关键：取消顶部边距，并轻微上提以抵消字体自带行高，确保与照片上缘齐平 */
+        margin-top: -12px !important; 
+        margin-bottom: 15px !important; 
+        line-height: 1 !important;
+    }
+
+    .desc-box { 
+        color: #1D1D1F !important; 
+        font-size: 16px; 
+        /* 关键：增加行间距 (2.0) 和 段落顶部间距 (30px) */
+        line-height: 2.0 !important; 
+        text-align: justify; 
+        margin-top: 30px !important; 
+    }
 
     /* 5. 投票卡片 */
     .vote-item {
@@ -286,7 +303,7 @@ with st.expander("✨ 灵感征集：在此提交您的新建议"):
 # 计票看板 (Prism + Donut)
 st.write("")
 st.divider()
-with st.expander("📊 查看实时计票看板 (Prism & Sector)", expanded=True):
+with st.expander("📊 查看实时计票看板 ", expanded=True):
     df_res = pd.DataFrame({'Name': all_candidates, 'Votes': [current_votes.get(n, 0) for n in all_candidates]})
     if df_res['Votes'].sum() > 0:
         g1, g2 = st.columns(2)
