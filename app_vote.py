@@ -86,14 +86,34 @@ st.markdown("""
         border-top: 1px solid #D2D2D7; color: #86868B !important; font-size: 12px; z-index: 1000;
     }
     header, footer, [data-testid="stHeader"] { visibility: hidden !important; }
-    .secret-wrap { position: fixed; bottom: 12px; right: 20px; z-index: 1001; opacity: 0.1; }
-    .secret-wrap button { background: transparent !important; border: none !important; color: #86868B !important; }
+     .secret-wrap { 
+        position: fixed !important; 
+        bottom: 70px !important; /* 位于页脚上方一点 */
+        left: 50% !important; 
+        transform: translateX(-50%) !important; 
+        z-index: 1001; 
+    }
+    
+    .secret-wrap button {
+        background-color: #0071E3 !important; /* 保持蓝色 */
+        color: #FFFFFF !important;
+        border-radius: 50% !important; /* 强制圆形 */
+        width: 60px !important;  /* 固定的宽高确保是圆 */
+        height: 60px !important;
+        font-size: 35px !important; /* 图标放大 */
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0,113,227,0.3) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ================= 2. 数据处理与持久化 =================
 DATA_FILE = "vote_data.json"
-ADMIN_PWD = "433admin"
+ADMIN_PWD = "xcwsalp88"
 
 def load_data():
     if os.path.exists(DATA_FILE):
@@ -235,6 +255,10 @@ with st.expander("📊 查看实时统计看板", expanded=False):
 st.markdown('<div class="fixed-footer">© 2026 肆叁叁月季起名社</div>', unsafe_allow_html=True)
 st.markdown('<div class="secret-wrap">', unsafe_allow_html=True)
 if st.button("↵", key="reset"): st.session_state.show_reset = True
+st.markdown('<div class="secret-wrap">', unsafe_allow_html=True)
+# 使用 ⌄ (无柄下箭头) 或 ⌃ (无柄上箭头)，根据你喜欢的朝向选一个
+if st.button("…", key="reset"): 
+    st.session_state.show_reset = True
 st.markdown('</div>', unsafe_allow_html=True)
 
 if st.session_state.get("show_reset"):
