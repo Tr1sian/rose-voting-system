@@ -86,27 +86,50 @@ st.markdown("""
         border-top: 1px solid #D2D2D7; color: #86868B !important; font-size: 12px; z-index: 1000;
     }
     header, footer, [data-testid="stHeader"] { visibility: hidden !important; }
-     .secret-wrap { 
+     /* 9. 秘密入口：彻底强制纯白、拟物凸起圆钮 */
+    .secret-wrap { 
         position: fixed !important; 
-        bottom: 70px !important; /* 位于页脚上方一点 */
+        bottom: 50px !important; 
         left: 50% !important; 
         transform: translateX(-50%) !important; 
-        z-index: 1001; 
+        z-index: 9999; 
     }
     
-    .secret-wrap button {
-        background-color: #0071E3 !important; /* 保持蓝色 */
-        color: #FFFFFF !important;
-        border-radius: 50% !important; /* 强制圆形 */
-        width: 60px !important;  /* 固定的宽高确保是圆 */
-        height: 60px !important;
-        font-size: 35px !important; /* 图标放大 */
+    /* 核心修复：通过多级路径强制覆盖蓝色背景 */
+    div.secret-wrap > div[data-testid="stButton"] > button {
+        background-color: #FFFFFF !important; /* 强制白色 */
+        color: #1D1D1F !important;             /* 黑色图标 */
+        width: 70px !important;
+        height: 70px !important;
+        border-radius: 50% !important;         /* 正圆 */
         border: none !important;
-        box-shadow: 0 4px 15px rgba(0,113,227,0.3) !important;
+        
+        /* 拟物化立体阴影：右下深色，左上亮白 */
+        box-shadow: 
+            8px 8px 16px #d1d1d6, 
+            -8px -8px 16px #ffffff !important;
+            
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    /* 悬停状态：阴影加深 */
+    div.secret-wrap > div[data-testid="stButton"] > button:hover {
+        background-color: #FFFFFF !important;
+        box-shadow: 
+            10px 10px 20px #c2c2c9, 
+            -10px -10px 20px #ffffff !important;
+        transform: translate(-50%, -2px) scale(1.05) !important; /* 保持居中并轻微放大 */
+    }
+
+    /* 内部图标强制黑色补丁 */
+    div.secret-wrap > div[data-testid="stButton"] > button p {
+        color: #1D1D1F !important;
+        font-size: 40px !important;
+        line-height: 70px !important;
+        margin: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -252,19 +275,34 @@ with st.expander("📊 查看实时统计看板", expanded=False):
     else: st.caption("尚无投票数据")
 
 # 页脚与秘密重置
-st.markdown('<div class="fixed-footer">© 2026 肆叁叁月季起名社</div>', unsafe_allow_html=True)
+# ================= 5. 页脚与秘密入口 (修正 Key 重复问题) =================
+st.write("")
+st.markdown("""<div class="fixed-footer">© 2026 肆叁叁月季起名社 &nbsp; </div>""", unsafe_allow_html=True)
+
+# 秘密按钮容器
+# ================= 5. 页脚与秘密入口 (白色拟物版) =================
+st.write("")
+# 固定页脚文案
+st.markdown("""<div class="fixed-footer">© 2026 肆叁叁月季起名社 &nbsp; </div>""", unsafe_allow_html=True)
+
+# 秘密按钮容器
 st.markdown('<div class="secret-wrap">', unsafe_allow_html=True)
-if st.button("↵", key="reset"): st.session_state.show_reset = True
-st.markdown('<div class="secret-wrap">', unsafe_allow_html=True)
-# 使用 ⌄ (无柄下箭头) 或 ⌃ (无柄上箭头)，根据你喜欢的朝向选一个
-if st.button("…", key="reset"): 
-    st.session_state.show_reset = True
+# 使用无柄上箭头 ⌃，Key 设为固定唯一值
+if st.button("…", key="apple_style_protrusion_btn"): 
+    st.session_state.show_reset = not st.session_state.get("show_reset", False)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# 管理员重置面板逻辑 (保持不变)
 if st.session_state.get("show_reset"):
-    pwd = st.text_input("Admin", type="password")
-    if pwd == ADMIN_PWD:
-        if st.button("RESET ALL"):
-            save_data({})
-            for k in [k for k in st.session_state.keys() if k.startswith("voted_")]: del st.session_state[k]
-            st.rerun()
+    st.write("")
+    _, mid_col, _ = st.columns([1, 2, 1])
+    with mid_col:
+        st.markdown('<div style="text-align:center; font-size:14px; color:#86868B;">ADMIN ACCESS</div>', unsafe_allow_html=True)
+        pwd = st.text_input("Password", type="password", label_visibility="collapsed", placeholder="输入管理员密码", key="admin_pwd_v3")
+        if pwd == ADMIN_PWD:
+            if st.button("RESET ALL DATA", type="primary", use_container_width=True, key="reset_final_step"):
+                save_data({})
+                st.cache_data.clear()
+                for k in list(st.session_state.keys()):
+                    if k.startswith("voted_") or k == "db_data": del st.session_state[k]
+                st.rerun()
